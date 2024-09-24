@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de Cartas Pokémon por Nome</title>
+    <script src="https://cdn.jsdelivr.net/npm/pokemontcgsdk@2.0.0/dist/pokemon-tcg-sdk.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 24px;
+            text-align: center;
+        }
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #cardDetails {
+            margin-top: 20px;
+        }
+        .card-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .card-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .card-item:hover {
+            transform: translateY(-5px);
+        }
+        .card-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .card-item h2 {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .card-item p {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .card-item .price {
+            font-weight: bold;
+            color: #4CAF50;
+            margin-top: 10px;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            .search-container {
+                flex-direction: column;
+            }
+            input, button {
+                width: 100%;
+            }
+            .card-list {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            .card-item h2 {
+                font-size: 16px;
+            }
+            .card-item p {
+                font-size: 12px;
+            }
+            .card-item .price {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>PokeBusca</h1>
+    <div class="search-container">
+        <input type="text" id="cardName" placeholder="Digite o nome do Pokémon">
+        <button onclick="buscarCartasComAPI()">Buscar</button>
+    </div>
+    <div id="cardDetails"></div>
+
+    <script>
+        // Configurar o SDK (substitua 'SUA_CHAVE_API' pela sua chave real, se necessário)
+        pokemon.configure({apiKey: 'SUA_CHAVE_API'});
+
+        async function buscarCartasComAPI() {
+            const cardName = document.getElementById('cardName').value;
+            const apiUrl = `https://api.pokemontcg.io/v2/cards?q=name:${cardName}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Cartas não encontradas');
+                }
+                const data = await response.json();
+                exibirDetalhes(data.data);
+            } catch (error) {
+                document.getElementById('cardDetails').innerHTML = `<p>Erro: ${error.message}</p>`;
+            }
+        }
+
+        function buscarCartasComSDK() {
+            const cardName = document.getElementById('cardName').value;
+            
+            pokemon.card.where({ q: `name:${cardName}` })
+                .then(cards => {
+                    exibirDetalhes(cards);
+                })
+                .catch(error => {
+                    document.getElementById('cardDetails').innerHTML = `<p>Erro: ${error.message}</p>`;
+                });
+        }
+
+        function exibirDetalhes(cards) {
+            if (cards.length === 0) {
+                document.getElementById('cardDetails').innerHTML = '<p>Nenhuma carta encontrada.</p>';
+                return;
+            }
+
+            const cardsHtml = cards.map(card => {
+                const price = card.tcgplayer && card.tcgplayer.prices && card.tcgplayer.prices.normal
+                    ? `$${card.tcgplayer.prices.normal.market.toFixed(2)}`
+                    : 'Preço não disponível';
+
+                return `
+                    <div class="card-item">
+                      <h2>${card.name}</h2>
+                        <img src="${card.images.small}" alt="${card.name}"> 
+                        <p class="price"><strong>Preço:</strong> ${price}</p>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('cardDetails').innerHTML = `
+                <h2>Cartas encontradas:</h2>
+                <div class="card-list">
+                    ${cardsHtml}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
