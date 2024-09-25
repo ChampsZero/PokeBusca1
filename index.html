@@ -214,7 +214,7 @@
         <img src="pokebusca.png" alt="PokéBusca Logo" class="logo" onclick="reloadPage()">
     </div>
     <div class="search-container">
-        <input type="text" id="cardName" placeholder="Digite o nome do Pokémon">
+        <input type="text" id="cardName" placeholder="Digite o nome do Pokémon" onkeypress="pesquisarComEnter(event)">
         <button onclick="buscarCartasComAPI()"><i class="fas fa-search"></i></button>
     </div>
     <div id="cardDetails"></div>
@@ -308,6 +308,12 @@
             } else {
                 themeToggle.classList.remove('fa-sun');
                 themeToggle.classList.add('fa-moon');
+            }
+        }
+
+        function pesquisarComEnter(event) {
+            if (event.key === 'Enter') {
+                buscarCartasComAPI();
             }
         }
     </script>
