@@ -275,17 +275,19 @@
             }
 
             const cardsHtml = cards.map(card => {
-                let highestPrice = null;
+                let highestPriceUSD = null;
+                let highestPriceEUR = null;
                 let priceType = '';
                 let priceParameter = '';
 
+                // Buscar preço em USD
                 if (card.tcgplayer && card.tcgplayer.prices) {
                     const prices = card.tcgplayer.prices;
                     for (const [type, priceObj] of Object.entries(prices)) {
                         if (type !== '1stEditionHolofoil') {
                             for (const [param, value] of Object.entries(priceObj)) {
-                                if (typeof value === 'number' && (highestPrice === null || value > highestPrice)) {
-                                    highestPrice = value;
+                                if (typeof value === 'number' && (highestPriceUSD === null || value > highestPriceUSD)) {
+                                    highestPriceUSD = value;
                                     priceType = type;
                                     priceParameter = param;
                                 }
@@ -294,14 +296,37 @@
                     }
                 }
 
-                const priceDisplay = highestPrice ? `$${highestPrice.toFixed(2)}` : 'Preço não disponível';
-                const priceInfo = highestPrice ? `(${priceType} - ${priceParameter})` : '';
+                // Buscar preço em EUR do Cardmarket se não houver preço em USD
+                if (highestPriceUSD === null && card.cardmarket && card.cardmarket.prices) {
+                    const prices = card.cardmarket.prices;
+                    for (const [param, value] of Object.entries(prices)) {
+                        if (typeof value === 'number' && (highestPriceEUR === null || value > highestPriceEUR)) {
+                            highestPriceEUR = value;
+                            priceType = 'Cardmarket';
+                            priceParameter = param;
+                        }
+                    }
+                }
+
+                let priceDisplayUSD = 'Preço não disponível';
+                let priceDisplayEUR = 'Preço não disponível';
+                let priceInfo = '';
+
+                if (highestPriceUSD !== null) {
+                    priceDisplayUSD = `$${highestPriceUSD.toFixed(2)}`;
+                    priceDisplayEUR = `€${(highestPriceUSD * 0.85).toFixed(2)}`;
+                    priceInfo = `(${priceType} - ${priceParameter})`;
+                } else if (highestPriceEUR !== null) {
+                    priceDisplayEUR = `€${highestPriceEUR.toFixed(2)}`;
+                    priceInfo = `(${priceType} - ${priceParameter})`;
+                }
 
                 return `
                     <div class="card-item">
                       <h2>${card.name}</h2>
                         <img src="${card.images.small}" alt="${card.name}"> 
-                        <p class="price"><strong>Maior Valor:</strong> ${priceDisplay}</p>
+                        <p class="price"><strong>Maior valor em Dólar:</strong> ${priceDisplayUSD}</p>
+                        <p class="price"><strong>Maior valor em Euro:</strong> ${priceDisplayEUR}</p>
                     </div>
                 `;
             }).join('');
