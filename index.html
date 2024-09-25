@@ -3,91 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Busca de Cartas Pokémon por Nome</title>
+    <title>PokéBusca</title>
     <script src="https://cdn.jsdelivr.net/npm/pokemontcgsdk@2.0.0/dist/pokemon-tcg-sdk.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --card-bg: #ffffff;
+            --card-border: #ddd;
+        }
+
         body {
             font-family: Arial, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             box-sizing: border-box;
-        }
-        h1 {
-            font-size: 24px;
             text-align: center;
-        }
-        .search-container {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            /* Remover transição de cores */
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            align-items: center;
+        }
+
+        /* Remover classe .dark-mode */
+
+        /* Remover estilo .theme-toggle */
+
+        .logo-container {
             margin-bottom: 20px;
         }
-        input, button {
+
+        .logo {
+            max-width: 200px;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        input {
+            flex-grow: 1;
             padding: 10px;
             font-size: 16px;
+            border: 1px solid #000000; /* Borda preta fina */
+            border-radius: 20px;
         }
+
         button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             background-color: #4CAF50;
             color: white;
             border: none;
             cursor: pointer;
             transition: background-color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
         #cardDetails {
             margin-top: 20px;
+            width: 100%;
         }
+
         .card-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 20px;
         }
+
         .card-item {
-            border: 1px solid #ddd;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: transform 0.3s;
+            width: 200px;
         }
+
         .card-item:hover {
             transform: translateY(-5px);
         }
+
         .card-item img {
             width: 100%;
             height: auto;
             border-radius: 5px;
         }
+
         .card-item h2 {
             font-size: 18px;
             margin: 10px 0;
         }
+
         .card-item p {
             font-size: 14px;
             margin: 5px 0;
         }
+
         .card-item .price {
             font-weight: bold;
             color: #4CAF50;
             margin-top: 10px;
         }
+
         @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            h1 {
-                font-size: 20px;
-            }
-            .search-container {
-                flex-direction: column;
+            .logo {
+                max-width: 150px;
             }
             input, button {
-                width: 100%;
+                font-size: 14px;
             }
-            .card-list {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            .card-item {
+                width: 150px;
             }
             .card-item h2 {
                 font-size: 16px;
@@ -98,26 +150,48 @@
             .card-item .price {
                 font-size: 14px;
             }
+            .search-container {
+                max-width: 250px;
+            }
+            input {
+                font-size: 14px;
+            }
+            button {
+                width: 35px;
+                height: 35px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>PokeBusca</h1>
+    <div class="logo-container">
+        <img src="pokebusca.png" alt="PokéBusca Logo" class="logo" onclick="reloadPage()">
+    </div>
     <div class="search-container">
         <input type="text" id="cardName" placeholder="Digite o nome do Pokémon">
-        <button onclick="buscarCartasComAPI()">Buscar</button>
+        <button onclick="buscarCartasComAPI()"><i class="fas fa-search"></i></button>
     </div>
     <div id="cardDetails"></div>
+    <div id="loadingMessage" style="display: none;">Buscando...</div>
 
     <script>
         // Configurar o SDK (substitua 'SUA_CHAVE_API' pela sua chave real, se necessário)
         pokemon.configure({apiKey: 'SUA_CHAVE_API'});
 
+        function reloadPage() {
+            window.location.reload();
+        }
+
         async function buscarCartasComAPI() {
             const cardName = document.getElementById('cardName').value;
             const apiUrl = `https://api.pokemontcg.io/v2/cards?q=name:${cardName}`;
+            const loadingMessage = document.getElementById('loadingMessage');
+            const cardDetails = document.getElementById('cardDetails');
 
             try {
+                loadingMessage.style.display = 'block';
+                cardDetails.innerHTML = '';
+
                 const response = await fetch(apiUrl);
                 if (!response.ok) {
                     throw new Error('Cartas não encontradas');
@@ -125,7 +199,9 @@
                 const data = await response.json();
                 exibirDetalhes(data.data);
             } catch (error) {
-                document.getElementById('cardDetails').innerHTML = `<p>Erro: ${error.message}</p>`;
+                cardDetails.innerHTML = `<p>Erro: ${error.message}</p>`;
+            } finally {
+                loadingMessage.style.display = 'none';
             }
         }
 
@@ -142,8 +218,10 @@
         }
 
         function exibirDetalhes(cards) {
+            const cardDetails = document.getElementById('cardDetails');
+
             if (cards.length === 0) {
-                document.getElementById('cardDetails').innerHTML = '<p>Nenhuma carta encontrada.</p>';
+                cardDetails.innerHTML = '<p>Nenhuma carta encontrada.</p>';
                 return;
             }
 
