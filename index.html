@@ -175,9 +175,41 @@
             display: block;
             margin: 0 auto 10px;
         }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: #555;
+        }
+
+        body.dark-mode {
+            --bg-color: #333;
+            --text-color: #fff;
+            --card-bg: #444;
+            --card-border: #555;
+        }
     </style>
 </head>
 <body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+    </button>
     <div class="logo-container">
         <img src="pokebusca.png" alt="PokéBusca Logo" class="logo" onclick="reloadPage()">
     </div>
@@ -257,11 +289,26 @@
             }).join('');
 
             cardDetails.innerHTML = `
-                <h2>Cartas encontradas:</h2>
+                <h2>Cartas Encontradas:</h2>
                 <div class="card-list">
                     ${cardsHtml}
                 </div>
             `;
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle i');
+            
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                themeToggle.classList.remove('fa-moon');
+                themeToggle.classList.add('fa-sun');
+            } else {
+                themeToggle.classList.remove('fa-sun');
+                themeToggle.classList.add('fa-moon');
+            }
         }
     </script>
 </body>
