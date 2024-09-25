@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="pngwing.com.ico" type="image/x-icon">
     <title>PokéBusca</title>
     <script src="https://cdn.jsdelivr.net/npm/pokemontcgsdk@2.0.0/dist/pokemon-tcg-sdk.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -161,6 +162,19 @@
                 height: 35px;
             }
         }
+
+        #loadingMessage {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #loadingMessage img {
+            width: 200px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px;
+        }
     </style>
 </head>
 <body>
@@ -172,7 +186,10 @@
         <button onclick="buscarCartasComAPI()"><i class="fas fa-search"></i></button>
     </div>
     <div id="cardDetails"></div>
-    <div id="loadingMessage" style="display: none;">Buscando...</div>
+    <div id="loadingMessage">
+        <img src="pikachu-running.gif" alt="Buscando...">
+        <p>BUSCANDO. . .</p>
+    </div>
 
     <script>
         // Configurar o SDK (substitua 'SUA_CHAVE_API' pela sua chave real, se necessário)
@@ -239,7 +256,7 @@
                 `;
             }).join('');
 
-            document.getElementById('cardDetails').innerHTML = `
+            cardDetails.innerHTML = `
                 <h2>Cartas encontradas:</h2>
                 <div class="card-list">
                     ${cardsHtml}
