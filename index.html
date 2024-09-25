@@ -275,15 +275,33 @@
             }
 
             const cardsHtml = cards.map(card => {
-                const price = card.tcgplayer && card.tcgplayer.prices && card.tcgplayer.prices.normal
-                    ? `$${card.tcgplayer.prices.normal.market.toFixed(2)}`
-                    : 'Preço não disponível';
+                let highestPrice = null;
+                let priceType = '';
+                let priceParameter = '';
+
+                if (card.tcgplayer && card.tcgplayer.prices) {
+                    const prices = card.tcgplayer.prices;
+                    for (const [type, priceObj] of Object.entries(prices)) {
+                        if (type !== '1stEditionHolofoil') {
+                            for (const [param, value] of Object.entries(priceObj)) {
+                                if (typeof value === 'number' && (highestPrice === null || value > highestPrice)) {
+                                    highestPrice = value;
+                                    priceType = type;
+                                    priceParameter = param;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                const priceDisplay = highestPrice ? `$${highestPrice.toFixed(2)}` : 'Preço não disponível';
+                const priceInfo = highestPrice ? `(${priceType} - ${priceParameter})` : '';
 
                 return `
                     <div class="card-item">
                       <h2>${card.name}</h2>
                         <img src="${card.images.small}" alt="${card.name}"> 
-                        <p class="price"><strong>Preço:</strong> ${price}</p>
+                        <p class="price"><strong>Maior Valor:</strong> ${priceDisplay}</p>
                     </div>
                 `;
             }).join('');
