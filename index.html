@@ -213,9 +213,236 @@
         body.dark-mode button:hover {
             background-color: #cccccc; /* Cor mais escura ao passar o mouse no modo escuro */
         }
+
+        /* Estilos para o menu em cascata */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #ffffff; /* Cor do ícone no modo claro */
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000; /* Cor de fundo no modo claro */
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode .menu-toggle {
+            color: #000000; /* Cor do ícone no modo escuro */
+            background-color: #ffffff; /* Cor de fundo no modo escuro */
+        }
+
+        .sidebar, .sets-sidebar {
+            position: fixed;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background-color: #f0f0f0; /* Cor cinza claro */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .sidebar {
+            left: -250px;
+        }
+
+        .sets-sidebar {
+            left: -250px;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sets-sidebar.active {
+            left: 250px;
+        }
+
+        body.dark-mode .sidebar,
+        body.dark-mode .sets-sidebar {
+            background-color: #333333; /* Cor cinza escuro para o modo escuro */
+        }
+
+        .sidebar ul li a,
+        .sets-sidebar ul li a {
+            color: #333333; /* Cor escura para o texto no modo claro */
+        }
+
+        body.dark-mode .sidebar ul li a,
+        body.dark-mode .sets-sidebar ul li a {
+            color: #f0f0f0; /* Cor clara para o texto no modo escuro */
+        }
+
+        .sets-sidebar h3 {
+            color: #333333; /* Cor escura para o título no modo claro */
+            padding: 10px;
+            margin: 0;
+        }
+
+        body.dark-mode .sets-sidebar h3 {
+            color: #f0f0f0; /* Cor clara para o título no modo escuro */
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 20px;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        /* Estilos para a cascata de sets */
+        .sets-sidebar ul {
+            list-style-type: none;
+            padding: 20px;
+        }
+
+        .sets-sidebar ul li {
+            margin-bottom: 15px;
+        }
+
+        .sets-sidebar ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        /* Estilos adicionais para os ícones nos sets */
+        .sets-sidebar ul li a {
+            display: flex;
+            align-items: center;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .sets-sidebar ul li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card {
+            width: 220px;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .card h3 {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .card .prices {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-color-secondary);
+        }
+
+        /* Estilos para dispositivos móveis */
+        @media (max-width: 600px) {
+            .menu-toggle {
+                top: 10px;
+                left: 10px;
+                width: 30px;
+                height: 30px;
+                font-size: 18px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
+            }
+
+            .sidebar, .sets-sidebar {
+                width: 200px;
+            }
+
+            .sets-sidebar.active {
+                left: 200px;
+            }
+        }
     </style>
 </head>
 <body>
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="sidebar">
+        <ul>
+            <li><a href="#" onclick="reloadPage()">Início</a></li>
+            <li><a href="#" onclick="loadSets('Scarlet & Violet')">Scarlet & Violet</a></li>
+            <li><a href="#" onclick="loadSets('Sword & Shield')">Sword & Shield</a></li>
+            <li><a href="#" onclick="loadSets('Other')">Other</a></li>
+            <li><a href="#" onclick="loadSets('Sun & Moon')">Sun & Moon</a></li>
+            <li><a href="#" onclick="loadSets('XY')">XY</a></li>
+            <li><a href="#" onclick="loadSets('Black & White')">Black & White</a></li>
+            <li><a href="#" onclick="loadSets('HeartGold & SoulSilver')">HeartGold & SoulSilver</a></li>
+            <li><a href="#" onclick="loadSets('Platinum')">Platinum</a></li>
+            <li><a href="#" onclick="loadSets('POP')">POP</a></li>
+            <li><a href="#" onclick="loadSets('Diamond & Pearl')">Diamond & Pearl</a></li>
+            <li><a href="#" onclick="loadSets('EX')">EX</a></li>
+            <li><a href="#" onclick="loadSets('NP')">NP</a></li>
+            <li><a href="#" onclick="loadSets('e-Card')">E-Card</a></li>
+            <li><a href="#" onclick="loadSets('Neo')">Neo</a></li>
+            <li><a href="#" onclick="loadSets('Gym')">Gym</a></li>
+            <li><a href="#" onclick="loadSets('Base')">Base</a></li>
+            <li><a href="#">Favoritos</a></li>
+            <li><a href="#">Configurações</a></li>
+        </ul>
+    </div>
+
+    <div class="sets-sidebar">
+        <h3 id="setsTitle"></h3>
+        <ul id="setsList"></ul>
+    </div>
+
     <button class="theme-toggle" onclick="toggleTheme()">
         <i class="fas fa-moon"></i>
     </button>
@@ -231,6 +458,8 @@
         <img src="pikachu-running.gif" alt="Buscando...">
         <p>BUSCANDO. . .</p>
     </div>
+
+    <div id="cardContainer" class="card-container"></div>
 
     <script>
         // Configurar o SDK (substitua 'SUA_CHAVE_API' pela sua chave real, se necessário)
@@ -276,18 +505,21 @@
         }
 
         function exibirDetalhes(cards) {
-            const cardDetails = document.getElementById('cardDetails');
+            const cardContainer = document.getElementById('cardContainer');
+            cardContainer.innerHTML = '';
+            cardContainer.className = 'card-container';
 
             if (cards.length === 0) {
-                cardDetails.innerHTML = '<p>Nenhuma carta encontrada.</p>';
+                cardContainer.innerHTML = '<p>Nenhuma carta encontrada.</p>';
                 return;
             }
 
-            const cardsHtml = cards.map(card => {
+            cards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+
                 let highestPriceUSD = null;
                 let highestPriceEUR = null;
-                let priceType = '';
-                let priceParameter = '';
 
                 // Buscar preço em USD
                 if (card.tcgplayer && card.tcgplayer.prices) {
@@ -297,8 +529,6 @@
                             for (const [param, value] of Object.entries(priceObj)) {
                                 if (typeof value === 'number' && (highestPriceUSD === null || value > highestPriceUSD)) {
                                     highestPriceUSD = value;
-                                    priceType = type;
-                                    priceParameter = param;
                                 }
                             }
                         }
@@ -311,47 +541,37 @@
                     for (const [param, value] of Object.entries(prices)) {
                         if (typeof value === 'number' && (highestPriceEUR === null || value > highestPriceEUR)) {
                             highestPriceEUR = value;
-                            priceType = 'Cardmarket';
-                            priceParameter = param;
                         }
                     }
                 }
 
                 let priceDisplayUSD = 'Preço não disponível';
                 let priceDisplayEUR = 'Preço não disponível';
-                let priceInfo = '';
 
                 if (highestPriceUSD !== null) {
                     priceDisplayUSD = `$${highestPriceUSD.toFixed(2)}`;
                     priceDisplayEUR = `€${(highestPriceUSD * 0.85).toFixed(2)}`;
-                    priceInfo = `(${priceType} - ${priceParameter})`;
                 } else if (highestPriceEUR !== null) {
                     priceDisplayEUR = `€${highestPriceEUR.toFixed(2)}`;
-                    priceInfo = `(${priceType} - ${priceParameter})`;
                 }
 
-                return `
-                    <div class="card-item">
-                      <h2>${card.name}</h2>
-                        <img src="${card.images.small}" alt="${card.name}"> 
-                        <p class="price"><strong>Maior valor em Dólar:</strong> ${priceDisplayUSD}</p>
-                        <p class="price"><strong>Maior valor em Euro:</strong> ${priceDisplayEUR}</p>
+                cardElement.innerHTML = `
+                    <img src="${card.images.small}" alt="${card.name}">
+                    <h3>${card.name}</h3>
+                    <div class="prices">
+                        <p><strong>Maior valor em Dólar:</strong> ${priceDisplayUSD}</p>
+                        <p><strong>Maior valor em Euro:</strong> ${priceDisplayEUR}</p>
                     </div>
                 `;
-            }).join('');
-
-            cardDetails.innerHTML = `
-                <h2>Cartas Encontradas:</h2>
-                <div class="card-list">
-                    ${cardsHtml}
-                </div>
-            `;
+                cardContainer.appendChild(cardElement);
+            });
         }
 
         function toggleTheme() {
             const body = document.body;
             const themeToggle = document.querySelector('.theme-toggle i');
             const searchButton = document.querySelector('button');
+            const menuToggle = document.querySelector('.menu-toggle');
             
             body.classList.toggle('dark-mode');
             
@@ -360,11 +580,15 @@
                 themeToggle.classList.add('fa-sun');
                 searchButton.style.backgroundColor = '#ffffff';
                 searchButton.style.color = '#000000';
+                menuToggle.style.backgroundColor = '#ffffff';
+                menuToggle.style.color = '#000000';
             } else {
                 themeToggle.classList.remove('fa-sun');
                 themeToggle.classList.add('fa-moon');
                 searchButton.style.backgroundColor = '#000000';
                 searchButton.style.color = '#ffffff';
+                menuToggle.style.backgroundColor = '#000000';
+                menuToggle.style.color = '#ffffff';
             }
         }
 
@@ -372,6 +596,186 @@
             if (event.key === 'Enter') {
                 buscarCartasComAPI();
             }
+        }
+
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            const setsSidebar = document.querySelector('.sets-sidebar');
+            sidebar.classList.toggle('active');
+            if (!sidebar.classList.contains('active')) {
+                setsSidebar.classList.remove('active');
+            }
+        }
+
+        async function loadSets(series) {
+            const setsList = document.getElementById('setsList');
+            const setsTitle = document.getElementById('setsTitle');
+            const setsSidebar = document.querySelector('.sets-sidebar');
+            setsList.innerHTML = '<li>Carregando...</li>';
+            setsSidebar.classList.add('active');
+
+            try {
+                const response = await fetch('https://api.pokemontcg.io/v2/sets');
+                const data = await response.json();
+                let filteredSets = data.data;
+
+                if (series !== 'all') {
+                    filteredSets = data.data.filter(set => set.series === series);
+                    setsTitle.textContent = `Sets de ${series}`;
+                } else {
+                    setsTitle.textContent = 'Todos os Sets';
+                }
+
+                setsList.innerHTML = filteredSets.map(set => `
+                    <li>
+                        <a href="#" onclick="loadSetDetails('${set.id}')">
+                            <i class="fas ${getSetIcon(set.series, set.name)}"></i>
+                            ${set.name}
+                        </a>
+                    </li>
+                `).join('');
+            } catch (error) {
+                setsList.innerHTML = '<li>Erro ao carregar os sets.</li>';
+            }
+        }
+
+        function getSetIcon(series, setName) {
+            switch (series) {
+                case 'Scarlet & Violet':
+                    return 'fa-sun';
+                case 'Sword & Shield':
+                    return 'fa-shield-alt';
+                case 'Sun & Moon':
+                    return 'fa-moon';
+                case 'XY':
+                    return 'fa-dna';
+                case 'Black & White':
+                    return 'fa-yin-yang';
+                default:
+                    return 'fa-book';
+            }
+        }
+
+        async function loadSetDetails(setId) {
+            const loadingMessage = document.getElementById('loadingMessage');
+            loadingMessage.style.display = 'block'; // Mostrar mensagem de carregamento
+
+            try {
+                const response = await fetch(`https://api.pokemontcg.io/v2/cards?q=set.id:${setId}`);
+                const data = await response.json();
+                const cards = data.data;
+
+                const cardContainer = document.getElementById('cardContainer');
+                cardContainer.innerHTML = '';
+
+                cards.forEach(card => {
+                    const cardElement = document.createElement('div');
+                    cardElement.classList.add('card');
+
+                    let highestPriceUSD = null;
+                    let highestPriceEUR = null;
+
+                    // Buscar preço em USD
+                    if (card.tcgplayer && card.tcgplayer.prices) {
+                        const prices = card.tcgplayer.prices;
+                        for (const [type, priceObj] of Object.entries(prices)) {
+                            if (type !== '1stEditionHolofoil') {
+                                for (const [param, value] of Object.entries(priceObj)) {
+                                    if (typeof value === 'number' && (highestPriceUSD === null || value > highestPriceUSD)) {
+                                        highestPriceUSD = value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Buscar preço em EUR do Cardmarket se não houver preço em USD
+                    if (highestPriceUSD === null && card.cardmarket && card.cardmarket.prices) {
+                        const prices = card.cardmarket.prices;
+                        for (const [param, value] of Object.entries(prices)) {
+                            if (typeof value === 'number' && (highestPriceEUR === null || value > highestPriceEUR)) {
+                                highestPriceEUR = value;
+                            }
+                        }
+                    }
+
+                    let priceDisplayUSD = 'Preço não disponível';
+                    let priceDisplayEUR = 'Preço não disponível';
+
+                    if (highestPriceUSD !== null) {
+                        priceDisplayUSD = `$${highestPriceUSD.toFixed(2)}`;
+                        priceDisplayEUR = `€${(highestPriceUSD * 0.85).toFixed(2)}`;
+                    } else if (highestPriceEUR !== null) {
+                        priceDisplayEUR = `€${highestPriceEUR.toFixed(2)}`;
+                    }
+
+                    cardElement.innerHTML = `
+                        <img src="${card.images.small}" alt="${card.name}">
+                        <h3>${card.name}</h3>
+                        <div class="prices">
+                            <p><strong>Maior valor em Dólar:</strong> ${priceDisplayUSD}</p>
+                            <p><strong>Maior valor em Euro:</strong> ${priceDisplayEUR}</p>
+                        </div>
+                    `;
+                    cardContainer.appendChild(cardElement);
+                });
+
+                // Fechar a barra lateral de sets
+                document.querySelector('.sets-sidebar').classList.remove('active');
+                // Fechar a barra lateral principal
+                document.querySelector('.sidebar').classList.remove('active');
+            } catch (error) {
+                console.error('Erro ao carregar os detalhes do set:', error);
+                alert('Erro ao carregar as cartas do set.');
+            } finally {
+                loadingMessage.style.display = 'none'; // Ocultar mensagem de carregamento
+            }
+        }
+
+        function getPriceHTML(prices) {
+            if (!prices) {
+                return '<p>Preços não disponíveis</p>';
+            }
+
+            const priceTypes = {
+                normal: 'Normal',
+                holofoil: 'Holofoil',
+                reverseHolofoil: 'Reverse Holofoil',
+                firstEditionHolofoil: 'First Edition Holofoil'
+            };
+
+            let maxDollarPrice = 0;
+            let maxEuroPrice = 0;
+
+            const priceHTML = Object.keys(prices).map(type => {
+                if (!priceTypes[type]) return ''; // Ignorar tipos não definidos em priceTypes
+
+                const dollarPrice = prices[type]?.market;
+                const euroPrice = prices[type]?.market * 0.85; // Conversão aproximada para euros
+
+                if (dollarPrice > maxDollarPrice) {
+                    maxDollarPrice = dollarPrice;
+                }
+
+                if (euroPrice > maxEuroPrice) {
+                    maxEuroPrice = euroPrice;
+                }
+
+                return `<p>${priceTypes[type]}: ${formatPrice(dollarPrice)} / €${formatPrice(euroPrice)}</p>`;
+            }).join('');
+
+            return `
+                ${priceHTML}
+                <p><strong>Maior valor (USD):</strong> ${formatPrice(maxDollarPrice)}</p>
+                <p><strong>Maior valor (EUR):</strong> €${formatPrice(maxEuroPrice)}</p>
+            `;
+        }
+
+        function formatPrice(price) {
+            if (price === undefined || price === null) {
+                return 'N/A';
+            }
+            return price.toFixed(2);
         }
     </script>
 </body>
