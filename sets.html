@@ -159,8 +159,8 @@
         }
 
         body.dark-mode .theme-toggle {
-            color: #ffffff; /* Cor do ícone no modo escuro */
-            background-color: #000000; /* Cor de fundo no modo escuro */
+            color: #000000; /* Cor do ícone no modo escuro */
+            background-color: #ffffff; /* Cor de fundo no modo escuro */
         }
 
         .back-button {
@@ -263,6 +263,92 @@ body.dark-mode .back-button {
                 grid-template-columns: 1fr; /* 1 coluna em telas de celular */
             }
         }
+        
+    @media (max-width: 1200px) {
+        .sets-container {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 992px) {
+        .sets-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sets-container {
+            grid-template-columns: 1fr;
+        }
+
+        .container {
+            padding: 10px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        .series-title {
+            font-size: 20px;
+        }
+
+        .set-card {
+            padding: 15px;
+        }
+
+        .set-logo {
+            width: 150px;
+            height: 75px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .logo {
+            width: 120px;
+        }
+
+        .theme-toggle,
+        .back-button {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+        }
+
+        .set-card h2 {
+            font-size: 18px;
+        }
+
+        .set-card p {
+            font-size: 14px;
+        }
+    }
+
+    /* Ajustes para o container de cartas */
+    #cardContainer {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    @media (max-width: 768px) {
+        #cardContainer {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+    }
+
+    @media (max-width: 576px) {
+        #cardContainer {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+
+        .card h3 {
+            font-size: 14px;
+        }
+
+        .card .prices p {
+            font-size: 12px;
+        }
+    }
+</style>
     </style>
 </head>
 <body>
