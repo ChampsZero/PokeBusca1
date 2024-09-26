@@ -357,6 +357,9 @@
             background-color: var(--card-bg);
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .card:hover {
@@ -365,9 +368,9 @@
         }
 
         .card img {
-            width: 100%;
+            max-width: 100%;
             height: auto;
-            border-radius: 5px;
+            margin-bottom: 10px;
         }
 
         .card h3 {
@@ -375,10 +378,24 @@
             font-size: 16px;
         }
 
-        .card .prices {
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .card button {
             margin-top: 10px;
-            font-size: 12px;
-            color: var(--text-color-secondary);
+            padding: 5px 10px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .card button:hover {
+            background-color: var(--button-hover-bg);
         }
 
         /* Estilos para dispositivos móveis */
@@ -407,6 +424,74 @@
                 left: 200px;
             }
         }
+
+        .sets-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .set-card {
+            width: 300px;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .set-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .set-card img.logo {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .set-card img.symbol {
+            max-width: 30px;
+            height: auto;
+            margin-top: 10px;
+        }
+
+        .set-card h3 {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .set-card p {
+            margin: 5px 0;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .set-card ul {
+            text-align: left;
+            padding-left: 20px;
+            list-style-type: none;
+        }
+
+        .set-card button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .set-card button:hover {
+            background-color: var(--button-hover-bg);
+        }
     </style>
 </head>
 <body>
@@ -433,7 +518,7 @@
             <li><a href="#" onclick="loadSets('Neo')">Neo</a></li>
             <li><a href="#" onclick="loadSets('Gym')">Gym</a></li>
             <li><a href="#" onclick="loadSets('Base')">Base</a></li>
-            <li><a href="#">Favoritos</a></li>
+            <li><a href="sets.html" id="allSetsLink">Todos os Sets</a></li>
             <li><a href="#">Configurações</a></li>
         </ul>
     </div>
@@ -460,6 +545,8 @@
     </div>
 
     <div id="cardContainer" class="card-container"></div>
+
+    <div id="setsContainer" class="sets-container"></div>
 
     <script>
         // Configurar o SDK (substitua 'SUA_CHAVE_API' pela sua chave real, se necessário)
@@ -777,6 +864,83 @@
             }
             return price.toFixed(2);
         }
+
+        document.getElementById('allSetsLink').addEventListener('click', loadAllSets);
+
+        async function loadAllSets() {
+            const loadingMessage = document.getElementById('loadingMessage');
+            loadingMessage.style.display = 'block';
+
+            try {
+                const response = await fetch('https://api.pokemontcg.io/v2/sets');
+                const data = await response.json();
+                const sets = data.data;
+
+                const setsContainer = document.getElementById('setsContainer');
+                setsContainer.innerHTML = '';
+
+                sets.forEach(set => {
+                    const setElement = document.createElement('div');
+                    setElement.classList.add('set-card');
+
+                    const releaseDate = new Date(set.releaseDate).toLocaleDateString('pt-BR');
+                    const updatedAt = new Date(set.updatedAt).toLocaleString('pt-BR');
+
+                    setElement.innerHTML = `
+                        <img src="${set.images.logo}" alt="${set.name}" class="logo">
+                        <h3>${set.name}</h3>
+                        <p><strong>Série:</strong> ${set.series}</p>
+                        <p><strong>ID:</strong> ${set.id}</p>
+                        <p><strong>Total de Cartas Impressas:</strong> ${set.printedTotal}</p>
+                        <p><strong>Total de Cartas (incluindo secretas):</strong> ${set.total}</p>
+                        <p><strong>Legalidade:</strong></p>
+                        <ul>
+                            <li>Standard: ${set.legalities.standard || 'N/A'}</li>
+                            <li>Expanded: ${set.legalities.expanded || 'N/A'}</li>
+                            <li>Unlimited: ${set.legalities.unlimited || 'N/A'}</li>
+                        </ul>
+                        <p><strong>Código PTCGO:</strong> ${set.ptcgoCode || 'N/A'}</p>
+                        <p><strong>Data de Lançamento:</strong> ${releaseDate}</p>
+                        <p><strong>Última Atualização:</strong> ${updatedAt}</p>
+                        <img src="${set.images.symbol}" alt="Símbolo do Set" class="symbol">
+                        <button onclick="loadSetDetails('${set.id}')">Ver Cartas</button>
+                    `;
+                    setsContainer.appendChild(setElement);
+                });
+
+                closeSidebars();
+            } catch (error) {
+                console.error('Erro ao carregar todos os sets:', error);
+                alert('Erro ao carregar todos os sets.');
+            } finally {
+                loadingMessage.style.display = 'none';
+            }
+        }
+
+        function closeSidebars() {
+            const sidebar = document.querySelector('.sidebar');
+            const setsSidebar = document.querySelector('.sets-sidebar');
+            sidebar.classList.remove('active');
+            setsSidebar.classList.remove('active');
+        }
+
+        // Adicionar evento de clique no documento para fechar o menu quando clicar fora
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const setsSidebar = document.querySelector('.sets-sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            if (!sidebar.contains(event.target) && 
+                !setsSidebar.contains(event.target) && 
+                event.target !== menuToggle) {
+                closeSidebars();
+            }
+        });
+
+        // Carregar todos os sets quando a página for carregada
+        window.addEventListener('load', loadAllSets);
+
+        // ... resto do código ...
     </script>
 </body>
 </html>
