@@ -397,6 +397,48 @@ body.dark-mode .back-button {
             font-size: 12px;
         }
     }
+
+    /* Estilos para o modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.8);
+    }
+
+    .modal-content {
+        background-color: var(--card-bg);
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid var(--card-border);
+        width: 80%;
+        max-width: 600px;
+        border-radius: 10px;
+        position: relative;
+    }
+
+    .close {
+        color: var(--text-color);
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .modal-image {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 20px;
+    }
+
+    .modal-details {
+        text-align: left;
+    }
 </style>
     </style>
 </head>
@@ -419,6 +461,15 @@ body.dark-mode .back-button {
 
     <div id="cardContainer"></div>
     <button id="backToSets" style="display: none;" onclick="showSets()">Voltar para Sets</button>
+
+    <!-- Adicione este elemento para o modal -->
+    <div id="cardModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" class="modal-image" src="" alt="Card Image">
+            <div id="modalDetails" class="modal-details"></div>
+        </div>
+    </div>
 
     <script>
 
@@ -452,6 +503,8 @@ function createCardElement(card) {
                 <p>${priceDisplayUSD} / ${priceDisplayEUR}</p>
             </div>
         `;
+
+        cardElement.addEventListener('click', () => showCardDetails(card));
 
         return cardElement;
     }
@@ -611,41 +664,23 @@ function createCardElement(card) {
             const cardElement = document.createElement('div');
             cardElement.classList.add('card');
 
-            let highestPriceUSD = null;
-            let highestPriceEUR = null;
+            let priceDisplayUSD = 'Preço não disponível';
+            let priceDisplayEUR = 'Preço não disponível';
 
             // Buscar preço em USD
             if (card.tcgplayer && card.tcgplayer.prices) {
                 const prices = card.tcgplayer.prices;
-                for (const [type, priceObj] of Object.entries(prices)) {
-                    if (type !== '1stEditionHolofoil') {
-                        for (const [param, value] of Object.entries(priceObj)) {
-                            if (typeof value === 'number' && (highestPriceUSD === null || value > highestPriceUSD)) {
-                                highestPriceUSD = value;
-                            }
-                        }
-                    }
+                const highestPrice = Math.max(...Object.values(prices).map(p => p.market || 0));
+                if (highestPrice > 0) {
+                    priceDisplayUSD = `$${highestPrice.toFixed(2)}`;
+                    priceDisplayEUR = `€${(highestPrice * 0.85).toFixed(2)}`;
                 }
-            }
-
-            // Buscar preço em EUR do Cardmarket se não houver preço em USD
-            if (highestPriceUSD === null && card.cardmarket && card.cardmarket.prices) {
-                const prices = card.cardmarket.prices;
-                for (const [param, value] of Object.entries(prices)) {
-                    if (typeof value === 'number' && (highestPriceEUR === null || value > highestPriceEUR)) {
-                        highestPriceEUR = value;
-                    }
+            } else if (card.cardmarket && card.cardmarket.prices) {
+                const price = card.cardmarket.prices.averageSellPrice;
+                if (price) {
+                    priceDisplayEUR = `€${price.toFixed(2)}`;
+                    priceDisplayUSD = `$${(price / 0.85).toFixed(2)}`;
                 }
-            }
-
-            let priceDisplayUSD = 'Preço não disponível';
-            let priceDisplayEUR = 'Preço não disponível';
-
-            if (highestPriceUSD !== null) {
-                priceDisplayUSD = `$${highestPriceUSD.toFixed(2)}`;
-                priceDisplayEUR = `€${(highestPriceUSD * 0.85).toFixed(2)}`;
-            } else if (highestPriceEUR !== null) {
-                priceDisplayEUR = `€${highestPriceEUR.toFixed(2)}`;
             }
 
             cardElement.innerHTML = `
@@ -656,6 +691,8 @@ function createCardElement(card) {
                     <p><strong>Maior valor em Euro:</strong> ${priceDisplayEUR}</p>
                 </div>
             `;
+
+            cardElement.addEventListener('click', () => showCardDetails(card));
 
             return cardElement;
         }
@@ -756,6 +793,69 @@ function showSets() {
         // Chame a função adjustLayout quando a página carregar e quando a janela for redimensionada
         window.addEventListener('load', adjustLayout);
         window.addEventListener('resize', adjustLayout);
+
+        function showCardDetails(card) {
+            const modal = document.getElementById('cardModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalDetails = document.getElementById('modalDetails');
+
+            modalImage.src = card.images.large;
+            modalImage.alt = card.name;
+
+            let highestPriceUSD = null;
+            let highestPriceEUR = null;
+
+            // Calcular o maior preço em USD
+            if (card.tcgplayer && card.tcgplayer.prices) {
+                const prices = card.tcgplayer.prices;
+                for (const [type, priceObj] of Object.entries(prices)) {
+                    if (type !== '1stEditionHolofoil') {
+                        for (const [param, value] of Object.entries(priceObj)) {
+                            if (typeof value === 'number' && (highestPriceUSD === null || value > highestPriceUSD)) {
+                                highestPriceUSD = value;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Calcular o maior preço em EUR
+            if (card.cardmarket && card.cardmarket.prices) {
+                const prices = card.cardmarket.prices;
+                for (const [param, value] of Object.entries(prices)) {
+                    if (typeof value === 'number' && (highestPriceEUR === null || value > highestPriceEUR)) {
+                        highestPriceEUR = value;
+                    }
+                }
+            }
+
+            let priceDisplayUSD = highestPriceUSD !== null ? `$${highestPriceUSD.toFixed(2)}` : 'Preço não disponível';
+            let priceDisplayEUR = highestPriceEUR !== null ? `€${highestPriceEUR.toFixed(2)}` : 'Preço não disponível';
+// Formatar a data de lançamento
+        const releaseDate = card.set.releaseDate ? new Date(card.set.releaseDate).toLocaleDateString('pt-BR') : 'Data não disponível';
+            let detailsHTML = `
+                <h2>${card.name}</h2>
+                <p><strong>Tipo:</strong> ${card.types ? card.types.join(', ') : 'N/A'}</p>
+                <p><strong>Raridade:</strong> ${card.rarity || 'N/A'}</p>
+                <p><strong>Set:</strong> ${card.set.name}</p>
+                <p><strong>Número no Set:</strong> ${card.number}/${card.set.printedTotal}</p>
+                <p><strong>Data de Lançamento:</strong> ${releaseDate}</p>
+                <p><strong>Maior valor em Dólar:</strong> ${priceDisplayUSD}</p>
+                <p><strong>Maior valor em Euro:</strong> ${priceDisplayEUR}</p>
+            `;
+
+            modalDetails.innerHTML = detailsHTML;
+
+            modal.style.display = 'block';
+        }
+
+        // Fechar o modal quando clicar no X ou fora do modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('cardModal');
+            if (event.target == modal || event.target.className == 'close') {
+                modal.style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>

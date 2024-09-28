@@ -7,6 +7,7 @@
     <title>PokéBusca</title>
     <script src="https://cdn.jsdelivr.net/npm/pokemontcgsdk@2.0.0/dist/pokemon-tcg-sdk.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
     <style>
         :root {
             --bg-color: #ffffff;
@@ -492,6 +493,48 @@
         .set-card button:hover {
             background-color: var(--button-hover-bg);
         }
+
+        /* Adicione estes estilos para o modal */
+        .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.8);
+    }
+
+    .modal-content {
+        background-color: var(--card-bg);
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid var(--card-border);
+        width: 80%;
+        max-width: 600px;
+        border-radius: 10px;
+        position: relative;
+    }
+
+    .close {
+        color: var(--text-color);
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .modal-image {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 20px;
+    }
+
+    .modal-details {
+        text-align: left;
+    }
     </style>
 </head>
 <body>
@@ -547,6 +590,17 @@
     <div id="cardContainer" class="card-container"></div>
 
     <div id="setsContainer" class="sets-container"></div>
+
+   
+
+    <!-- Adicione este elemento para o modal -->
+    <div id="cardModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" class="modal-image" src="" alt="Card Image">
+            <div id="modalDetails" class="modal-details"></div>
+        </div>
+    </div>
 
     <script>
         // Configurar o SDK (substitua 'SUA_CHAVE_API' pela sua chave real, se necessário)
@@ -643,7 +697,7 @@
                 }
 
                 cardElement.innerHTML = `
-                    <img src="${card.images.small}" alt="${card.name}">
+                    <img src="${card.images.small}" alt="${card.name}" onclick="showCardDetails('${card.id}')">
                     <h3>${card.name}</h3>
                     <div class="prices">
                         <p><strong>Maior valor em Dólar:</strong> ${priceDisplayUSD}</p>
@@ -798,7 +852,7 @@
                     }
 
                     cardElement.innerHTML = `
-                        <img src="${card.images.small}" alt="${card.name}">
+                        <img src="${card.images.small}" alt="${card.name}" onclick="showCardDetails('${card.id}')">
                         <h3>${card.name}</h3>
                         <div class="prices">
                             <p><strong>Maior valor em Dólar:</strong> ${priceDisplayUSD}</p>
@@ -937,11 +991,124 @@
                 closeSidebars();
             }
         });
+       
+        function adjustLayout() {
+            const width = window.innerWidth;
+            const container = document.querySelector('.container');
+            const setsContainer = document.querySelector('.sets-container');
+            const cardContainer = document.getElementById('cardContainer');
 
-        // Carregar todos os sets quando a página for carregada
-        window.addEventListener('load', loadAllSets);
+            if (width <= 576) {
+                container.style.maxWidth = '100%';
+                container.style.padding = '10px';
+                if (setsContainer) setsContainer.style.gridTemplateColumns = '1fr';
+                if (cardContainer) cardContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
+            } else if (width <= 768) {
+                container.style.maxWidth = '540px';
+                container.style.padding = '20px';
+                if (setsContainer) setsContainer.style.gridTemplateColumns = '1fr';
+                if (cardContainer) cardContainer.style.gridTemplateColumns = '1fr';
+            } else if (width <= 992) {
+                container.style.maxWidth = '720px';
+                if (setsContainer) setsContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                if (cardContainer) cardContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+            } else if (width <= 1200) {
+                container.style.maxWidth = '960px';
+                if (setsContainer) setsContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                if (cardContainer) cardContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            } else {
+                container.style.maxWidth = '1200px';
+                if (setsContainer) setsContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+                if (cardContainer) cardContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(200px, 1fr))';
+            }
+            // Implemente a lógica de ajuste de layout aqui, se necessário
+        }
+        // Adicione estes novos event listeners
+        window.addEventListener('load', adjustLayout);
+        window.addEventListener('resize', adjustLayout);
 
-        // ... resto do código ...
+
+        async function showCardDetails(cardId) {
+            const modal = document.getElementById('cardModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalDetails = document.getElementById('modalDetails');
+
+            
+            
+            
+
+            try {
+                const response = await fetch(`https://api.pokemontcg.io/v2/cards/${cardId}`);
+                const data = await response.json();
+                const card = data.data;
+
+                modalImage.src = card.images.large;
+                modalImage.alt = card.name;
+
+                let highestPriceUSD = null;
+                let highestPriceEUR = null;
+
+                // Calcular o maior preço em USD
+                if (card.tcgplayer && card.tcgplayer.prices) {
+                    const prices = card.tcgplayer.prices;
+                    for (const [type, priceObj] of Object.entries(prices)) {
+                        if (type !== '1stEditionHolofoil') {
+                            for (const [param, value] of Object.entries(priceObj)) {
+                                if (typeof value === 'number' && (highestPriceUSD === null || value > highestPriceUSD)) {
+                                    highestPriceUSD = value;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Calcular o maior preço em EUR
+                if (card.cardmarket && card.cardmarket.prices) {
+                    const prices = card.cardmarket.prices;
+                    for (const [param, value] of Object.entries(prices)) {
+                        if (typeof value === 'number' && (highestPriceEUR === null || value > highestPriceEUR)) {
+                            highestPriceEUR = value;
+                        }
+                    }
+                }
+
+                let priceDisplayUSD = highestPriceUSD !== null ? `$${highestPriceUSD.toFixed(2)}` : 'Preço não disponível';
+                let priceDisplayEUR = highestPriceEUR !== null ? `€${highestPriceEUR.toFixed(2)}` : 'Preço não disponível';
+
+                // Formatar a data de lançamento
+                const releaseDate = card.set.releaseDate ? new Date(card.set.releaseDate).toLocaleDateString('pt-BR') : 'Data não disponível';
+
+                let detailsHTML = `
+                    <h2>${card.name}</h2>
+                    <p><strong>Tipo:</strong> ${card.types ? card.types.join(', ') : 'N/A'}</p>
+                    <p><strong>Raridade:</strong> ${card.rarity || 'N/A'}</p>
+                    <p><strong>Set:</strong> ${card.set.name}</p>
+                    <p><strong>Número no Set:</strong> ${card.number}/${card.set.printedTotal}</p>
+                    <p><strong>Data de Lançamento:</strong> ${releaseDate}</p>
+                    <p><strong>Maior valor em Dólar:</strong> ${priceDisplayUSD}</p>
+                    <p><strong>Maior valor em Euro:</strong> ${priceDisplayEUR}</p>
+                `;
+
+                modalDetails.innerHTML = detailsHTML;
+                modal.style.display = 'block';
+            } catch (error) {
+                console.error('Erro ao carregar os detalhes da carta:', error);
+                modalDetails.innerHTML = '<p>Erro ao carregar os detalhes da carta.</p>';
+            } finally {
+                loadingMessage.style.display = 'none';
+            }
+        }
+
+        // Fechar o modal quando clicar no X ou fora do modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('cardModal');
+            if (event.target == modal || event.target.className == 'close') {
+                modal.style.display = 'none';
+            }
+        }
+        
+
+        
     </script>
 </body>
 </html>
