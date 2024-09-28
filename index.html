@@ -535,6 +535,30 @@
     .modal-details {
         text-align: left;
     }
+
+    .back-arrow {
+        color: var(--text-color);
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 24px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 10px;
+        transition: transform 0.3s ease;
+    }
+
+    .back-arrow:hover {
+        transform: scale(1.1);
+    }
+
+    .modal-content {
+        position: relative;
+        /* ... outros estilos ... */
+    }
+
+    /* ... outros estilos ... */
     </style>
 </head>
 <body>
@@ -596,7 +620,9 @@
     <!-- Adicione este elemento para o modal -->
     <div id="cardModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <button class="back-arrow" aria-label="Voltar para as cartas">
+                <i class="fas fa-arrow-left"></i>
+            </button>
             <img id="modalImage" class="modal-image" src="" alt="Card Image">
             <div id="modalDetails" class="modal-details"></div>
         </div>
@@ -1099,16 +1125,25 @@
             }
         }
 
-        // Fechar o modal quando clicar no X ou fora do modal
-        window.onclick = function(event) {
-            const modal = document.getElementById('cardModal');
-            if (event.target == modal || event.target.className == 'close') {
-                modal.style.display = 'none';
-            }
-        }
         
 
+        function closeModal() {
+            const modal = document.getElementById('cardModal');
+            modal.style.display = 'none';
+        }
+
+        // Adicionar evento de clique ao botão de voltar
+        document.querySelector('.back-arrow').addEventListener('click', closeModal);
+
+        // Fechar o modal quando clicar fora dele
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('cardModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        });
         
+
     </script>
 </body>
 </html>
