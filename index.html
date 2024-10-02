@@ -769,11 +769,33 @@
         function toggleMenu() {
             const sidebar = document.querySelector('.sidebar');
             const setsSidebar = document.querySelector('.sets-sidebar');
-            sidebar.classList.toggle('active');
-            if (!sidebar.classList.contains('active')) {
-                setsSidebar.classList.remove('active');
-            }
+            sidebar.classList.toggle('active'); // Alterna a classe 'active' da sidebar
+            setsSidebar.classList.remove('active'); // Fecha a sidebar de sets, se estiver aberta
         }
+
+        function closeSidebars() {
+            const sidebar = document.querySelector('.sidebar');
+            const setsSidebar = document.querySelector('.sets-sidebar');
+            sidebar.classList.remove('active');
+            setsSidebar.classList.remove('active');
+        }
+
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const setsSidebar = document.querySelector('.sets-sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            if (!sidebar.contains(event.target) && 
+                !setsSidebar.contains(event.target) && 
+                event.target !== menuToggle &&
+                !menuToggle.contains(event.target)) {
+                closeSidebars();
+            }
+        });
+
+        document.querySelector('.menu-toggle').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
 
         async function loadSets(series) {
             const setsList = document.getElementById('setsList');
