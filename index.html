@@ -559,6 +559,34 @@
     }
 
     /* ... outros estilos ... */
+
+    .audio-toggle {
+        position: fixed;
+        top: 20px;
+        right: 70px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        transition: background-color 0.3s;
+    }
+
+    .audio-toggle:hover {
+        background-color: #555;
+    }
+
+    body.dark-mode .audio-toggle {
+        background-color: #fff;
+        color: #333;
+    }
+
     </style>
 </head>
 <body>
@@ -586,7 +614,7 @@
             <li><a href="#" onclick="loadSets('Gym')">Gym</a></li>
             <li><a href="#" onclick="loadSets('Base')">Base</a></li>
             <li><a href="sets.html" id="allSetsLink">Todos os Sets</a></li>
-            <li><a href="#">Configurações</a></li>
+            
         </ul>
     </div>
 
@@ -598,6 +626,16 @@
     <button class="theme-toggle" onclick="toggleTheme()">
         <i class="fas fa-moon"></i>
     </button>
+
+    <button class="audio-toggle" onclick="toggleAudio()">
+        <i class="fas fa-volume-up"></i>
+    </button>
+
+    <audio id="backgroundAudio" loop>
+        <source src="pokemon_center_gsc.mp3" type="audio/mpeg">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+
     <div class="logo-container">
         <img src="pokebusca.png" alt="PokéBusca Logo" class="logo" onclick="reloadPage()">
     </div>
@@ -750,6 +788,8 @@
                 searchButton.style.color = '#000000';
                 menuToggle.style.backgroundColor = '#ffffff';
                 menuToggle.style.color = '#000000';
+                document.querySelector('.audio-toggle').style.backgroundColor = '#ffffff';
+                document.querySelector('.audio-toggle').style.color = '#000000';
             } else {
                 themeToggle.classList.remove('fa-sun');
                 themeToggle.classList.add('fa-moon');
@@ -757,6 +797,8 @@
                 searchButton.style.color = '#ffffff';
                 menuToggle.style.backgroundColor = '#000000';
                 menuToggle.style.color = '#ffffff';
+                document.querySelector('.audio-toggle').style.backgroundColor = '#000000';
+                document.querySelector('.audio-toggle').style.color = '#ffffff';
             }
         }
 
@@ -1165,6 +1207,43 @@
             }
         });
         
+
+        let isPlaying = true; // Alterado para true
+        const audio = document.getElementById('backgroundAudio');
+
+        // Função para iniciar a música automaticamente
+        function startBackgroundMusic() {
+            audio.play().catch(error => {
+                console.log("Reprodução automática bloqueada pelo navegador:", error);
+                isPlaying = false;
+                updateAudioToggleIcon();
+            });
+        }
+
+        function toggleAudio() {
+            const audioToggle = document.querySelector('.audio-toggle i');
+            if (isPlaying) {
+                audio.pause();
+            } else {
+                audio.play();
+            }
+            isPlaying = !isPlaying;
+            updateAudioToggleIcon();
+        }
+
+        function updateAudioToggleIcon() {
+            const audioToggle = document.querySelector('.audio-toggle i');
+            if (isPlaying) {
+                audioToggle.classList.remove('fa-volume-mute');
+                audioToggle.classList.add('fa-volume-up');
+            } else {
+                audioToggle.classList.remove('fa-volume-up');
+                audioToggle.classList.add('fa-volume-mute');
+            }
+        }
+
+        // Iniciar a música quando a página carregar
+        window.addEventListener('load', startBackgroundMusic);
 
     </script>
 </body>

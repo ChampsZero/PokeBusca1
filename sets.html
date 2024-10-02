@@ -460,7 +460,39 @@ body.dark-mode .back-button {
     .modal-details {
         text-align: left;
     }
-</style>
+
+        .audio-toggle {
+            position: fixed;
+            top: 20px;
+            right: 70px;
+            z-index: 1000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .audio-toggle:hover {
+            background-color: #333333;
+        }
+
+        body.dark-mode .audio-toggle {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        body.dark-mode .audio-toggle:hover {
+            background-color: #cccccc;
+        }
+
     </style>
 </head>
 <body>
@@ -470,6 +502,13 @@ body.dark-mode .back-button {
     <button class="back-button" onclick="goToHomePage()">
         <i class="fas fa-arrow-left"></i>
     </button>
+    <button class="audio-toggle" onclick="toggleAudio()">
+        <i class="fas fa-volume-up"></i>
+    </button>
+    <audio id="backgroundAudio" loop>
+        <source src="pokemon_center_gsc.mp3" type="audio/mpeg">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
     <div class="container">
         <img src="pokebusca.png" alt="PokéBusca" class="logo" id="logoImage">
         <h1 id="pageTitle">Todos os Sets Pokémon TCG</h1>
@@ -895,6 +934,56 @@ function showSets() {
                 closeModal();
             }
         });
+
+        let isPlaying = true;
+        const audio = document.getElementById('backgroundAudio');
+
+        function startBackgroundMusic() {
+            audio.play().catch(error => {
+                console.log("Reprodução automática bloqueada pelo navegador:", error);
+                isPlaying = false;
+                updateAudioToggleIcon();
+            });
+        }
+
+        function toggleAudio() {
+            if (isPlaying) {
+                audio.pause();
+            } else {
+                audio.play();
+            }
+            isPlaying = !isPlaying;
+            updateAudioToggleIcon();
+        }
+
+        function updateAudioToggleIcon() {
+            const audioToggle = document.querySelector('.audio-toggle i');
+            if (isPlaying) {
+                audioToggle.classList.remove('fa-volume-mute');
+                audioToggle.classList.add('fa-volume-up');
+            } else {
+                audioToggle.classList.remove('fa-volume-up');
+                audioToggle.classList.add('fa-volume-mute');
+            }
+        }
+
+        window.addEventListener('load', startBackgroundMusic);
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const themeIcon = document.querySelector('.theme-toggle i');
+            themeIcon.classList.toggle('fa-moon');
+            themeIcon.classList.toggle('fa-sun');
+
+            const audioToggle = document.querySelector('.audio-toggle');
+            if (document.body.classList.contains('dark-mode')) {
+                audioToggle.style.backgroundColor = '#ffffff';
+                audioToggle.style.color = '#000000';
+            } else {
+                audioToggle.style.backgroundColor = '#000000';
+                audioToggle.style.color = '#ffffff';
+            }
+        }
     </script>
 </body>
 </html>
